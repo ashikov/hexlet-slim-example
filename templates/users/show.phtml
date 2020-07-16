@@ -1,1 +1,1 @@
-<h1>Hello, <?= $nickname ?></h1>
+<h1>Hello, <?= htmlspecialchars($nickname) ?></h1>
