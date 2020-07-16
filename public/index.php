@@ -16,8 +16,21 @@ $app->get('/', function ($request, $response) {
     return $response->write('Welcome to Slim!');
 });
 
-$app->get('/users', function ($request, $response) {
-    return $response->write('GET /users');
+$users = ['mike', 'mishel', 'adel', 'keks', 'kamila', 'roman', 'ella'];
+
+$app->get('/users', function ($request, $response, $args) use ($users) {
+    $params = [
+        'users' => $users
+    ];
+    $term = $request->getQueryParam('term');
+    if (isset($term)) {
+        $params = [
+            'users' => array_filter($users, fn($user) => strpos($user, $term) !== false),
+            'term' => $term
+        ];
+    }
+
+    return $this->get('renderer')->render($response, 'users/index.phtml', $params);
 });
 
 $app->get('/courses/{id}', function ($request, $response, array $args) {
