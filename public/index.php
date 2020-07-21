@@ -5,7 +5,12 @@ require __DIR__ . '/../vendor/autoload.php';
 use Slim\Factory\AppFactory;
 use DI\Container;
 
+session_start();
+
 $container = new Container();
+$container->set('flash', function () {
+    return new \Slim\Flash\Messages();
+});
 $container->set('renderer', function () {
     return new \Slim\Views\PhpRenderer(__DIR__ . '/../templates');
 });
@@ -41,6 +46,18 @@ $app->get('/courses/{id}', function ($request, $response, array $args) {
 $app->get('/users/{id}', function ($request, $response, $args) {
     $params = ['id' => $args['id'], 'nickname' => 'user-' . $args['id']];
     return $this->get('renderer')->render($response, 'users/show.phtml', $params);
+});
+
+$app->get('/foo', function ($request, $response) {
+    $this->get('flash')->addMessage('success', 'This is a message!');
+
+    return $response->withRedirect('/bar');
+});
+
+$app->get('/bar', function ($request, $response, $args) {
+    $messages = $this->get('flash')->getMessages();
+    print_r($messages);
+    return $response;
 });
 
 $app->run();
